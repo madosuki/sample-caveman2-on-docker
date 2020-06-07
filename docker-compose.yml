@@ -19,7 +19,7 @@ services:
     #   - 8888:8888
     volumes:
       - ../../common_lisp/like-the-certain-board/:/root/.roswell/local-projects/like-the-certain-board/
-    # mount caveman project directory
+    # above line means is mount caveman2 project directory.
 
   db:
     image: mysql:latest
@@ -31,7 +31,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root_pass
       MYSQL_DATABASE: mysite
-      MYSQL_USER: user
+      MYSQL_USER: lain
       MYSQL_PASSWORD: user_pass
     expose:
       - 3306
