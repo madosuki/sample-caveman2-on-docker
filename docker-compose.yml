@@ -1,0 +1,61 @@
+version: '3.8'
+services:
+  webapp:
+    image: frolvlad/alpine-glibc:alpine-3.11
+    container_name: webapp_when_use_roswell
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+      network: host
+    # tty: true
+    restart: "no"
+    entrypoint: "/root/.roswell/local-projects/like-the-certain-board/dockerRun.sh"
+    # command: "/root/.roswell/bin/clackup --port 8080 /root/.roswell/local-projects/like-the-certain-board/app.lisp"
+    depends_on:
+      - db
+    expose:
+      - 8888
+    # ports:
+    #   - 8888:8888
+    volumes:
+      - ../../common_lisp/like-the-certain-board/:/root/.roswell/local-projects/like-the-certain-board/
+    # mount caveman project directory
+
+  db:
+    image: mysql:latest
+    container_name: mysql_docker
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: mysite
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_pass
+    expose:
+      - 3306
+    # ports:
+    #   - 3306:3306
+    volumes:
+      - ./mysql/sql:/docker-entrypoint-initdb.d
+      # - ./conf:/var/lib/mysql
+      # - ./log:/var/log/mysql
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_on_docker
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    restart: "no"
+    depends_on:
+      - webapp
+    # expose:
+    #   - 8080
+    ports:
+      - 80:80
+      - 443:443
+#     networks:
+#       - app-net    
+
