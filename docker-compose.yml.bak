@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.4'
 services:
   webapp:
     image: frolvlad/alpine-glibc:alpine-3.11
@@ -9,15 +9,16 @@ services:
       network: host
     # tty: true
     restart: "no"
-    entrypoint: "/root/.roswell/local-projects/like-the-certain-board/dockerRun.sh"
+    command: "/root/.roswell/local-projects/like-the-certain-board/dockerRun.sh"
     # command: "/root/.roswell/bin/clackup --port 8080 /root/.roswell/local-projects/like-the-certain-board/app.lisp"
-    depends_on:
-      - db
     expose:
-      - 8888
+      - 8080
+    ports:
+      - 8080:8080
+    networks:
+      - app-net
     volumes:
       - ../../common_lisp/like-the-certain-board/:/root/.roswell/local-projects/like-the-certain-board/
-    # above line means is mount caveman2 project directory.
 
   db:
     image: mysql:latest
@@ -33,21 +34,29 @@ services:
       MYSQL_PASSWORD: user_pass
     expose:
       - 3306
+    ports:
+      - 3306:3306
+    networks:
+      - app-net
     volumes:
       - ./mysql/sql:/docker-entrypoint-initdb.d
-      - ./conf:/etc/mysql/conf.d
-      - ./log:/var/log/mysql
+      # - ./conf:/var/lib/mysql
+      # - ./log:/var/log/mysql
 
   nginx:
     image: nginx:latest
     container_name: nginx_on_docker
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
     restart: "no"
-    depends_on:
-      - webapp
+    expose:
+      - 8080
     ports:
       - 80:80
       - 443:443
+    networks:
+      - app-net
+    
+networks:
+  app-net:
+    driver: bridge
+
 
